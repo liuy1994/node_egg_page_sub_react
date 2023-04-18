@@ -1,4 +1,4 @@
-FROM nextjs-docker
+FROM node:18.15.0-buster
 
 COPY . ./temp
 
