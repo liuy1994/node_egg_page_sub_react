@@ -1,12 +1,13 @@
+import { useModel } from "@umijs/max"
 import { Button, Space } from "antd"
 import { marked } from "marked"
 import { useEffect, useState } from "react"
 import styles from "./index.module.less"
 
 const Markdown = () => {
+  const masterProps = useModel("@@qiankunStateFromMaster")
   const [content, setContent] = useState<string>("")
   const [html, setHtml] = useState<any>(null)
-
   const onKeyDown = (e: any) => {
     if (e.code === "Tab") {
       e.preventDefault()
@@ -14,12 +15,19 @@ const Markdown = () => {
     }
   }
 
+  useEffect(() => {
+    if (!content) {
+      setContent(masterProps?.content || "")
+    }
+  }, [masterProps?.content])
+
   const onChange = (e: any) => {
     setContent(e?.target?.value || "")
   }
 
   useEffect(() => {
     setHtml(marked.parse(content))
+    masterProps?.setContent(content)
   }, [content])
 
   const [tabs, setTabs] = useState<any[]>(["left", "right"])
@@ -37,6 +45,7 @@ const Markdown = () => {
       <header className={styles.header}>
         <Space>
           <Button
+            size={"small"}
             type={"primary"}
             onClick={() => hiddenTab("left")}
             disabled={tabs.length === 1 && tabs[0] === "left"}
@@ -44,6 +53,7 @@ const Markdown = () => {
             {tabs.includes("left") ? "隐藏" : "显示"}左边
           </Button>
           <Button
+            size={"small"}
             type={"primary"}
             onClick={() => hiddenTab("right")}
             disabled={tabs.length === 1 && tabs[0] === "right"}
